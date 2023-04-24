@@ -4,7 +4,11 @@ import random
 
 # random.seed(5641984138)
 
+PopulationSize = 10000
 
+ilosc_itemow = 25
+
+max_weight = 25
 
 class Item:
     def __init__(self, name, value, weigth):
@@ -26,11 +30,13 @@ names = ["Naszyjnik", "Laptop", "Telefon", "Kolczyk",\
          "Sprzedam Opla", "Ciemność", "Bóg Imperator"]
 
 
-all_items = [ Item(random.choice(names), random.randint(0,20), random.randint(1,20))\
-    for i in range(100)]
+
+
+all_items = [ Item(random.choice(names), random.randint(1,7), random.randint(1,12))\
+    for i in range(ilosc_itemow)]
  
 
-max_weight = 1
+
 N = len(all_items)
 
 print( str(N) + " items: ")
@@ -41,12 +47,6 @@ print("")
 
 def decode(genotype):
     selected_items = [all_items[i] for i in range(len(genotype)) if genotype[i]]
-
-    selected_items = []
-    for i in range(len(genotype)):
-        if genotype[i]:
-            selected_items.append( all_items[i] )  
-
     return selected_items
 
 
@@ -68,7 +68,7 @@ options = EAOpts()
 options.random_individual = Binary.random(N)
 options.decode = decode
 options.fitness = fitness
-options.pop_size = 10
+options.pop_size = PopulationSize
 options.crossover = Binary.onePointCrossover
 options.mutation = Binary.mutation
 options.stop_generations = 1000

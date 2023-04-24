@@ -19,13 +19,21 @@ class Item:
  
 
 all_items = [ \
-    Item("Naszyjnik", 800, 20),\
-    Item("Laptop", 2000, 1),\
-    Item("Telefon", 1000, 0.3),\
-    Item("Kolczyki", 500, 0.1),\
+    Item("Naszyjnik", 7, 5),\
+    Item("Laptop", 7, 12),\
+    Item("Telefon", 4, 1),\
+    Item("Kolczyki", 3, 0.5),\
+    Item("pieniadze", 7, 1),\
+    Item("telewizor", 7, 12),\
+    Item("pierscionek", 6, 1),\
+    Item("Obraz", 3, 7),\
+    Item("złoto", 7, 12),\
+    Item("playstation", 7, 7),\
+    Item("pistolet", 4, 1),\
+    Item("cos", 3, 0.5),\
     ]
 
-max_weight = 1
+max_weight = 25
 N = len(all_items)
 
 print( str(N) + " items: ")
@@ -36,12 +44,6 @@ print("")
 
 def decode(genotype):
     selected_items = [all_items[i] for i in range(len(genotype)) if genotype[i]]
-
-    selected_items = []
-    for i in range(len(genotype)):
-        if genotype[i]:
-            selected_items.append( all_items[i] )  
-
     return selected_items
 
 
