@@ -2,21 +2,22 @@ clear all; close all; clc
 % macierze opisujące uklad
 % x(i+1) = A*x(i) + B*u(i)
 
-A = [1 1; 1 2];
-B = [1 1 1; 1 1 1];
+A = [2 0; 1 2];
+B = [2; 3];
 
 % stan początkowy układu
-x0 = [1; 1]
+x0 = [10; 15]
 
-Q = [1 0; 0 1]; % musi być 1 albo 0
-F = [1 0; 0 1];
+Q = [3 -2; -2 2]; % musi być 1 albo 0
+F = [0 0; 0 0];
 
 R_all = {
-        [1 2 2; 2 2 1; 2 1 1]
-        [1 2 2; 2 2 1; 2 1 1]*2
-        [1 2 2; 2 2 1; 2 1 1]*3
-        [1 2 2; 2 2 1; 2 1 1]*4
-        [1 2 2; 2 2 1; 2 1 1]*5
+        [10]
+        [12]
+        [14]
+        [20]
+        [40]
+        [60]
     }; % musi być >0
 
 N = 20; % liczba całkowita 
@@ -131,39 +132,79 @@ end
 
 %%
 % PLOTy
+% 
+% for i = 1:n
+%     
+%     figure('Name',"x_" + string(i) + "(i)",'NumberTitle','off')
+%     hold on
+%     title("przebieg x_" + string(i) + "(i)")
+%     
+%     Legend_pos = string.empty
+% 
+%     for j = 1:length(R_all)
+%         stairs([0:N]', X{j}(i,:)');
+%         Legend_pos(end+1) = "x_{" + i + "}(i) dla R = " + mat2str(R_all{j})
+%     end
+% 
+%     legend(Legend_pos)
+% end
+% 
+% % Plot u(i)
+% for i = 1:m
+%     figure('Name',"u_" + string(i) + "(i)",'NumberTitle','off')
+%     hold on
+%     title("przebieg u_" + string(i) + "(i)")
+% 
+%     Legend_pos = string.empty
+% 
+%     for j = 1:length(R_all)
+%         stairs([0:N-1]', U{j}(i,:)');
+%         Legend_pos(end+1) = "u_{" + i + "}(i) dla R = " + mat2str(R_all{j})
+%     end
+% 
+%     legend(Legend_pos)
+% end
+% 
 
+
+%figure
+%tiledlayout(2, max(n,m))
+% plot x(i)
 for i = 1:n
-    
+    %nexttile(2*i-1)
+
     figure('Name',"x_" + string(i) + "(i)",'NumberTitle','off')
     hold on
-    title("przebieg x_" + string(i) + "(i)")
+    %title("przebieg x_" + string(i) + "(i)")
     
     Legend_pos = string.empty
 
     for j = 1:length(R_all)
-        stairs([0:N]', X{j}(i,:)');
+        plot([0:N]', X{j}(i,:)');
         Legend_pos(end+1) = "x_{" + i + "}(i) dla R = " + mat2str(R_all{j})
     end
 
     legend(Legend_pos)
+    
 end
 
 % Plot u(i)
 for i = 1:m
+    %nexttile(2*i)
     figure('Name',"u_" + string(i) + "(i)",'NumberTitle','off')
     hold on
-    title("przebieg u_" + string(i) + "(i)")
+    %title("przebieg u_" + string(i) + "(i)")
 
     Legend_pos = string.empty
 
     for j = 1:length(R_all)
-        stairs([0:N-1]', U{j}(i,:)');
+        plot([0:N-1]', U{j}(i,:)');
         Legend_pos(end+1) = "u_{" + i + "}(i) dla R = " + mat2str(R_all{j})
     end
 
     legend(Legend_pos)
-end
 
+end
 
 
 

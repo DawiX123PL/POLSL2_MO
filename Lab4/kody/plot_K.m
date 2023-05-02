@@ -2,18 +2,17 @@ clear all; close all; clc
 % macierze opisujące uklad
 % x(i+1) = A*x(i) + B*u(i)
 
-A = [1 1; 1 2];
-B = [1 1 1; 1 1 1];
+
+A = [2 0; 1 2];
+B = [2; 3];
 
 % stan początkowy układu
-%x0 = [1 1]';
+x0 = [10; 15]
 
-x0 = [1; 1]
+Q = [3 -2; -2 2]; % musi być 1 albo 0
+F = [0 0; 0 0];
+R = [12]; % musi być >0
 
-
-Q = [1 0; 0 1]; % musi być 1 albo 0
-R = [1 2 2; 2 2 1; 2 1 1]; % musi być >0
-F = [1 0; 0 1];
 
 N = 20; % liczba całkowita 
 
@@ -132,7 +131,7 @@ for pos_x = 1:n
             k_xy_i(end+1) = Ki{1}(pos_x, pos_y);
         end
 
-        stairs(k_xy_i)
+        plot(k_xy_i)
 
     end
 end
