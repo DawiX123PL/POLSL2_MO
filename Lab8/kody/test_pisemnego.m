@@ -6,30 +6,28 @@
 clear all; close all; clc
 
 
-x0 = 15; % stan poczatkowy
-t = [2 2 2 2 2]; % początkowe wspolczynniki kary
-N = 7; % horyzont sterowania
-I = @(x,u) sum( x.^2 + 1.5 * u.^2, "all"); % wskaznik jakosci
+x0 = 1; % stan poczatkowy
+t = [2 2]; % początkowe wspolczynniki kary
+N = 3; % horyzont sterowania
+%I = @(x,u) sum( x.^2 + 1.5 * u.^2, "all"); % wskaznik jakosci
+I = @(x,u) sum(x.^2 + u, "all"); % wskaznik jakosci
 
 % ograniczenia 
 R = {
     @(x,u,v) 0.5*( x(end) - v ).^2
-    @(x,u,v) 0.5*( x(3+1) - v ).^2
-    @(x,u,v) sum( (u-v).*max(0, (u-v)) ,"all")
     @(x,u,v) sum( (-u-v).*max(0, (-u-v)) ,"all")
-    @(x,u,v) 0.5*( u(3+1) - v ).^2
 };
 
-a = { [70], [40], ones(N,1) * 5,  ones(N,1) * 5, [3] }
-v = a
-c = 1
+a = { [16], [-4;-4;-4] }
 
-epsilon = 0.1
+v = a
+c = 2
+
+epsilon = 0.001
 beta = 2
 alfa = 0.5
 
-
-for nr_iteracji = 1:1000
+for nr_iteracji = 1:2
     % krok 4
 
     % sterowanie jako wartość startowa funkcji fminsearch
@@ -37,18 +35,15 @@ for nr_iteracji = 1:1000
     u_optymalne = u;
 
     % obliczanie optymalnego sterowania 
-    u_optymalne = fminsearch(@(u) I_calc(u, I, R, t, x0, v), u_optymalne);
-    x_optymalne = obliczanie_x(u_optymalne, x0);
+    u_optymalne = fminsearch(@(u_) I_calc(u_, I, R, t, x0, v), u_optymalne)
+    x_optymalne = obliczanie_x(u_optymalne, x0)
     I_optymalne = I_calc(u, I, R, t, x0, v);
 
     % krok 5 wyznaczenie 'r'
     r = {
         x_optymalne(end) - a{1}
-        x_optymalne(3+1) - a{2} % tu byl blad
-        max(0, u_optymalne - a{3})
-        max(0, -u_optymalne - a{4})
-        u_optymalne(3+1) - a{5}
-    };
+        max(0, -u_optymalne - a{2})
+    }
 
     % krok 6 - liczenie gamma
     vra = [];
@@ -74,7 +69,7 @@ for nr_iteracji = 1:1000
     
     % krok 11
     if(gamma >= c)
-        t = beta * t;
+        t = beta * t
         for w = 1:length(v )
             v{w} = a{w} - (1/beta) * r{w};
         end
@@ -87,7 +82,7 @@ end
 function x = obliczanie_x(u, x0)
     
     % rówanie stanu
-    x_plus_1 = @(x,u) x + 3*u;
+    x_plus_1 = @(x,u) x + 2*u;
 
     % obliczenie x
     x = [x0];
