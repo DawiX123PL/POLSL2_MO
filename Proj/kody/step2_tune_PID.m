@@ -1,80 +1,89 @@
-clear all; close all; clc;
+clear all; clc;
 
-%PID_kr = 0.67245
-%PID_Ti = 1.42
-%PID_Td = 0.355
-
-% PID_kr = 0.41568
-% PID_Ti = 1.74
-% PID_Td = 0.435
-% 
-% filter_coeficient = 100
-% 
-% w_target = 0.5;
-% 
-% u_limit = [0 1];
-
-%% optymalizacja metoda sprzezonego gradientu
-
+%% parametry optymalizacji
 
 % PID_kr = 1
-% PID_Ti = 1
-% PID_Td = 1
+% PID_Ti = 1000
+% PID_Td = 0
 
 PID_kr = 0.41568
 PID_Ti = 1.74
 PID_Td = 0.435
 
+filter_coeficient = 100;
+w_target = 0.5;
+u_limit = [0 1];
 
 
-x0 = [PID_kr, PID_Ti, PID_Td]
+x0 = [PID_kr, PID_Ti, PID_Td] % punkt poczatkowy optymalizacji
 
-F = @(x) PID_to_ISE(x(1), x(2), x(3))
-n = 100;
-epsilon = 0.001;
-delta = 0.01;
-alfa = 0.1;
+n = 30;
+epsilon = 0.00001;
+delta = 0.001;
+alfa = 0.02;
 
-x_min = GradientSearchMin(F, x0, epsilon, n, delta, alfa);
+
+
+%% optymalizacja metoda sprzezonego gradientu i wyswietlenie wyniku
+
+% wskaźnik jakości
+QI = @(e) ISE_100(e)
+%QI = @(e) ISE_20_100(e)
+%QI = @(e) ISE_ISC(e)
+%QI = @(e) MeanError(e)
+
+% przeksztalcenie minimalizowanej funkcji do postaci y = F(x)
+F = @(x) PID_to_QI(x(1), x(2), x(3), filter_coeficient, w_target, u_limit, QI)
+
+% minimalizacja
+tic
+% [x_min, trajectory, iter] = GradientSearchMin(F, x0, epsilon, n, delta, alfa);
+[x_min, trajectory, iter] = GradientConjugateSearchMin(F, x0, epsilon, n, delta, alfa);
+toc
 
 PID_kr_opt = x_min(1)
 PID_Ti_opt = x_min(2)
 PID_Td_opt = x_min(3)
 
-Plot_PID(PID_kr_opt, PID_Ti_opt, PID_Td_opt)
+quality_indicator = Plot_PID(PID_kr_opt, PID_Ti_opt, PID_Td_opt, filter_coeficient, w_target, u_limit, QI);
 
+%% wyświetlenie trajektorii
+trajectory_kr = zeros(size(trajectory));
+trajectory_Ti = zeros(size(trajectory));
+trajectory_Td = zeros(size(trajectory));
 
-%% symulacja
+for i = 1:length(trajectory)
+    trajectory_kr(i) = trajectory{i}(1);
+    trajectory_Ti(i) = trajectory{i}(2);
+    trajectory_Td(i) = trajectory{i}(3);
+end
 
+figure
+plot3(trajectory_kr, trajectory_Ti, trajectory_Td);
+xlabel("kr");
+ylabel("Ti");
+zlabel("Td");
+grid on
 
-ise = PID_to_ISE(1,2,3)
+%% wyświetlenie plotów dla danego regulatora PID
 
+function quality_indicator = Plot_PID(PID_kr, PID_Ti, PID_Td, filter_coeficient, w_target, u_limit, QI)
 
-function ise = Plot_PID(PID_kr, PID_Ti, PID_Td)
-
-    filter_coeficient = 100;
-    w_target = 0.5;
-    u_limit = [0 1];
-    
     w=warning('off','all');
     sim_out = sim("object_with_PID.slx", "SrcWorkspace", "current", 'FastRestart', 'on');
     warning(w);
-
-    sim_out.SimulationMetadata.TimingInfo
-
-    Y = sim_out.Y;
-    E = sim_out.E;
     
     figure
     hold on
-    plot(Y);
-    plot(E);
-    
-    ise = ISE(E)    
+    plot(sim_out.Y);
+    plot(sim_out.E);
+
+    quality_indicator = QI(sim_out.E);
 end
 
+%% funkcja uruchamiająca symulacje i zwracająca wskażnik jakości
 
-function ise = PID_to_ISE(PID_kr, PID_Ti, PID_Td)
+function quality_indicator = PID_to_QI(PID_kr, PID_Ti, PID_Td, filter_coeficient, w_target, u_limit, QI)
 
     filter_coeficient = 100;
     w_target = 0.5;
@@ -89,24 +98,7 @@ function ise = PID_to_ISE(PID_kr, PID_Ti, PID_Td)
     Y = sim_out.Y;
     E = sim_out.E;
     
-%     figure
-%     hold on
-%     plot(Y);
-%     plot(E);
-    
-    ise = ISE(E)    
+    quality_indicator = QI(E)    
 end
 
 
-%% wskaznik jakosci ISE
-
-function ise = ISE(E_ts)
-
-    E = E_ts.Data(1:end-1);
-    T = E_ts.Time;
-
-    Delta_t = T(2:end) - T(1:end-1);
-    
-    ise = sum( (E.^2) .* Delta_t );
-
-end

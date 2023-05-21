@@ -1,4 +1,4 @@
-function [x_min, trajectory, iter] =  GradientSearchMin(f, x0, eps, n, delta, alfa)
+function [x_min, trajectory, iter] =  GradientSearchMin(f, x0, epsilon, n, delta, alfa)
 
    
     trajectory = {};
@@ -27,6 +27,12 @@ function [x_min, trajectory, iter] =  GradientSearchMin(f, x0, eps, n, delta, al
         trajectory{iter} = x_current;
 
         x_current =  x_current - dir * alfa;
+
+        % kryterium stopu 1 
+        if norm(grad) < epsilon
+            break
+        end
+
     end
 
 
