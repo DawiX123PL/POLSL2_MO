@@ -20,7 +20,7 @@ u_limit = [0 1];
 
 x0 = [PID_kr, PID_Ti, PID_Td] % punkt poczatkowy optymalizacji
 
-n = 100;
+n = 200;
 epsilon = {0.00001, 0.00001};
 %delta = 0.001; % delta = {0.001, 0.01, 0.1, 1}
 %alfa = 1; % alfa = {0.05, 1}
@@ -62,25 +62,25 @@ end
 figure
 tiledlayout(2,2);
 nexttile;
-plot([0: iter], trajectory_kr);
+plot([0: length(trajectory_kr)-1], trajectory_kr);
 ylabel("kr");
 xlabel("iteration");
 grid on
 
 nexttile;
-plot([0: iter], trajectory_Ti);
+plot([0: length(trajectory_Ti)-1], trajectory_Ti);
 ylabel("Ti");
 xlabel("iteration");
 grid on
 
 nexttile;
-plot([0: iter], trajectory_Td);
+plot([0: length(trajectory_Td)-1], trajectory_Td);
 ylabel("Td");
 xlabel("iteration");
 grid on
 
 nexttile;
-plot([0: iter], Q_trajectory);
+plot([0: length(Q_trajectory)-1], Q_trajectory);
 ylabel("QI");
 xlabel("iteration");
 grid on

@@ -13,13 +13,14 @@ Y = f(X1,X2);
 
 F = @(x) f(x(1),x(2));
 
-eps = 0.0000000001;
-iter_max = 100000;
+%eps = {0.00001, 0.00001};
+eps = 0.00001
+iter_max = 5000;
 delta = 0.0001;
 alfa = 1;
 
-[x_min, trajectory, iter] = GradientSearchMin(F, [-10; -150], eps, iter_max, delta, alfa);
-%[x_min, trajectory, iter] = GradientConjugateSearchMin(F, [-10, -150], eps, iter_max, delta, alfa);
+% [x_min, trajectory, iter] = GradientSearchMin(F, [-10; -150], eps, iter_max, delta, alfa);
+[x_min, trajectory, iter] = GradientConjugateSearchMin(F, [-10, -150], eps, iter_max, delta, alfa);
 
 trajectory_x1 = zeros(size(trajectory));
 trajectory_x2 = zeros(size(trajectory));
