@@ -21,6 +21,7 @@ class Item:
         return str(self.name) + " - " + str(self.value) + " PLN, " + str(self.weigth) + " kg"
 
 
+
 #all_items = [ Item(names, Value, weight)]
 all_items = [ 
 Item('Pies', 2, 12), 

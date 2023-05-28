@@ -1,4 +1,7 @@
-clear all; delete all; clc;
+%clear all; delete all; clc;
+
+
+
 
 %% parametry optymalizacji
 
@@ -17,17 +20,16 @@ u_limit = [0 1];
 
 x0 = [PID_kr, PID_Ti, PID_Td] % punkt poczatkowy optymalizacji
 
-n = 200;
-epsilon = 0.00001;
-delta = 0.1;
-alfa = 0.02;
-
+n = 100;
+epsilon = {0.00001, 0.00001};
+%delta = 0.001; % delta = {0.001, 0.01, 0.1, 1}
+%alfa = 1; % alfa = {0.05, 1}
 
 
 %% optymalizacja metoda sprzezonego gradientu i wyswietlenie wyniku
 
 % wskaźnik jakości
-QI = @(e) ISE_100(e)
+%QI = @(e) ISE_100(e)
 %QI = @(e) ISE_20_100(e)
 %QI = @(e) ISE_ISC(e)
 %QI = @(e) MeanError(e)
@@ -45,9 +47,6 @@ PID_kr_opt = x_min(1)
 PID_Ti_opt = x_min(2)
 PID_Td_opt = x_min(3)
 
-%% wyświetlenie plotow
-
-quality_indicator = Plot_PID(PID_kr_opt, PID_Ti_opt, PID_Td_opt, filter_coeficient, w_target, u_limit, QI);
 
 %% wyświetlenie trajektorii
 trajectory_kr = zeros(size(trajectory));
@@ -63,33 +62,50 @@ end
 figure
 tiledlayout(2,2);
 nexttile;
-plot(trajectory_kr);
+plot([0: iter], trajectory_kr);
 ylabel("kr");
 xlabel("iteration");
 grid on
 
 nexttile;
-plot(trajectory_Ti);
+plot([0: iter], trajectory_Ti);
 ylabel("Ti");
 xlabel("iteration");
 grid on
 
 nexttile;
-plot(trajectory_Td);
+plot([0: iter], trajectory_Td);
 ylabel("Td");
 xlabel("iteration");
 grid on
 
 nexttile;
-plot(Q_trajectory);
+plot([0: iter], Q_trajectory);
 ylabel("QI");
 xlabel("iteration");
 grid on
 
+saveas(gcf, DESTINATION_FOLDER + 'trajectory.png')
+saveas(gcf, DESTINATION_FOLDER + 'trajectory.svg')
+
 %% wyświetlenie plotów dla danego regulatora PID
 
-function quality_indicator = Plot_PID(PID_kr, PID_Ti, PID_Td, filter_coeficient, w_target, u_limit, QI)
 
+quality_indicator = Plot_PID(PID_kr_opt, PID_Ti_opt, PID_Td_opt, filter_coeficient, w_target, u_limit, QI);
+saveas(gcf, DESTINATION_FOLDER + 'output.png')
+saveas(gcf, DESTINATION_FOLDER + 'output.svg')
+
+
+%% zapisanie macierzy do plikow
+
+save(DESTINATION_FOLDER + 'trajectory.mat', 'trajectory');
+save(DESTINATION_FOLDER + 'Q_trajectory.mat', 'Q_trajectory');
+save(DESTINATION_FOLDER + 'PID_min.mat', 'x_min');
+save(DESTINATION_FOLDER + 'quality_indicator.mat', 'quality_indicator');
+
+%% 
+
+function quality_indicator = Plot_PID(PID_kr, PID_Ti, PID_Td, filter_coeficient, w_target, u_limit, QI)
     w=warning('off','all');
     sim_out = sim("object_with_PID.slx", "SrcWorkspace", "current", 'FastRestart', 'on');
     warning(w);
@@ -98,6 +114,11 @@ function quality_indicator = Plot_PID(PID_kr, PID_Ti, PID_Td, filter_coeficient,
     hold on
     plot(sim_out.Y);
     plot(sim_out.E);
+    xlabel("time");
+    yline(0);
+    yline(w_target);
+    
+    legend("y(t)","e(t)", '', '', "Location","east");
 
     quality_indicator = QI(sim_out.E);
 end
