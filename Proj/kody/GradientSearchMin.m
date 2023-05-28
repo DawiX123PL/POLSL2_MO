@@ -1,16 +1,25 @@
-function [x_min, trajectory, iter] =  GradientSearchMin(f, x0, epsilon, n, delta, alfa)
+function [x_min, trajectory, iter, Q_trajectory] =  GradientSearchMin(f, x0, epsilon, n, delta, alfa)
 
    
     trajectory = {};
+    Q_trajectory = [];
 
     x_current = x0;
 
-    waitbar_h = waitbar(0, 'Obliczenia metodą najszybszego spadku', 'Name', 'Obliczenia metodą najszybszego spadku');
- 
+    waitbar_h = waitbar(0, 'Obliczenia metodą najszybszego spadku', ...
+        'Name', 'Obliczenia metodą najszybszego spadku', ...
+        'CreateCancelBtn','setappdata(gcbf,''canceling'',1)');
+
+    setappdata(waitbar_h,'canceling',0);
+
     f_value = inf;
     %alfa = 0.01;
 
     for iter = 1:n
+
+        if getappdata(waitbar_h,'canceling')
+            break;
+        end
 
         waitbar(iter/n, waitbar_h, sprintf( ...
             "iteracja: %d/%d wartość funkcji: %f alfa: %f ", ...
@@ -25,6 +34,7 @@ function [x_min, trajectory, iter] =  GradientSearchMin(f, x0, epsilon, n, delta
 
 
         trajectory{iter} = x_current;
+        Q_trajectory(iter) = f_value;
 
         x_current =  x_current - dir * alfa;
 
@@ -36,7 +46,7 @@ function [x_min, trajectory, iter] =  GradientSearchMin(f, x0, epsilon, n, delta
     end
 
 
-    close(waitbar_h);
+    delete(waitbar_h);
 
 
     x_min = x_current;

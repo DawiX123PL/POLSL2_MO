@@ -1,4 +1,4 @@
-clear all; clc;
+clear all; delete all; clc;
 
 %% parametry optymalizacji
 
@@ -17,9 +17,9 @@ u_limit = [0 1];
 
 x0 = [PID_kr, PID_Ti, PID_Td] % punkt poczatkowy optymalizacji
 
-n = 30;
+n = 200;
 epsilon = 0.00001;
-delta = 0.001;
+delta = 0.1;
 alfa = 0.02;
 
 
@@ -37,13 +37,15 @@ F = @(x) PID_to_QI(x(1), x(2), x(3), filter_coeficient, w_target, u_limit, QI)
 
 % minimalizacja
 tic
-% [x_min, trajectory, iter] = GradientSearchMin(F, x0, epsilon, n, delta, alfa);
-[x_min, trajectory, iter] = GradientConjugateSearchMin(F, x0, epsilon, n, delta, alfa);
+[x_min, trajectory, iter, Q_trajectory] = GradientSearchMin(F, x0, epsilon, n, delta, alfa);
+% [x_min, trajectory, iter] = GradientConjugateSearchMin(F, x0, epsilon, n, delta, alfa);
 toc
 
 PID_kr_opt = x_min(1)
 PID_Ti_opt = x_min(2)
 PID_Td_opt = x_min(3)
+
+%% wyświetlenie plotow
 
 quality_indicator = Plot_PID(PID_kr_opt, PID_Ti_opt, PID_Td_opt, filter_coeficient, w_target, u_limit, QI);
 
@@ -59,10 +61,29 @@ for i = 1:length(trajectory)
 end
 
 figure
-plot3(trajectory_kr, trajectory_Ti, trajectory_Td);
-xlabel("kr");
+tiledlayout(2,2);
+nexttile;
+plot(trajectory_kr);
+ylabel("kr");
+xlabel("iteration");
+grid on
+
+nexttile;
+plot(trajectory_Ti);
 ylabel("Ti");
-zlabel("Td");
+xlabel("iteration");
+grid on
+
+nexttile;
+plot(trajectory_Td);
+ylabel("Td");
+xlabel("iteration");
+grid on
+
+nexttile;
+plot(Q_trajectory);
+ylabel("QI");
+xlabel("iteration");
 grid on
 
 %% wyświetlenie plotów dla danego regulatora PID
