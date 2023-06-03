@@ -37,11 +37,11 @@ function [x_min, trajectory, iter, Q_trajectory] =  GradientSearchMin(f, x0, eps
         x_old = x_current;
         x_current =  x_current - dir * alfa;
         
-        if iter > 1
-            if( Q_trajectory(iter) > Q_trajectory(iter-1) )
-                alfa = alfa / 2;
-            end
-        end
+%         if iter > 1
+%             if( Q_trajectory(iter) > Q_trajectory(iter-1) )
+%                 alfa = alfa / 2;
+%             end
+%         end
 
         % kryterium stopu 1 
         if norm(grad) < epsilon{1}

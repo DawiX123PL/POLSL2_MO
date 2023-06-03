@@ -1,7 +1,7 @@
 %clear all; delete all; clc;
 
 
-
+DESTINATION_FOLDER = "C:\Users\Dawid\Desktop\POLSL_MO\Proj\wyniki\ISE_100\Wyniki_2\"
 
 %% parametry optymalizacji
 
@@ -12,30 +12,32 @@
 PID_kr = 0.41568
 PID_Ti = 1.74
 PID_Td = 0.435
+PID_h = 0.1
 
 filter_coeficient = 100;
 w_target = 0.5;
 u_limit = [0 1];
 
+Model_file = "object_with_PID.slx"
 
 x0 = [PID_kr, PID_Ti, PID_Td] % punkt poczatkowy optymalizacji
 
 n = 200;
 epsilon = {0.00001, 0.00001};
-%delta = 0.001; % delta = {0.001, 0.01, 0.1, 1}
-%alfa = 1; % alfa = {0.05, 1}
+delta = 0.001; % delta = {0.001, 0.01, 0.1, 1}
+alfa = 1; % alfa = {0.05, 1}
 
 
 %% optymalizacja metoda sprzezonego gradientu i wyswietlenie wyniku
 
 % wskaźnik jakości
-%QI = @(e) ISE_100(e)
+QI = @(e) ISE_100(e)
 %QI = @(e) ISE_20_100(e)
 %QI = @(e) ISE_ISC(e)
 %QI = @(e) MeanError(e)
 
 % przeksztalcenie minimalizowanej funkcji do postaci y = F(x)
-F = @(x) PID_to_QI(x(1), x(2), x(3), filter_coeficient, w_target, u_limit, QI)
+F = @(x) PID_to_QI(x(1), x(2), x(3), filter_coeficient, w_target, u_limit, PID_h, QI, Model_file)
 
 % minimalizacja
 tic
@@ -91,7 +93,7 @@ saveas(gcf, DESTINATION_FOLDER + 'trajectory.svg')
 %% wyświetlenie plotów dla danego regulatora PID
 
 
-quality_indicator = Plot_PID(PID_kr_opt, PID_Ti_opt, PID_Td_opt, filter_coeficient, w_target, u_limit, QI);
+quality_indicator = Plot_PID(PID_kr_opt, PID_Ti_opt, PID_Td_opt, filter_coeficient, w_target, u_limit, PID_h, QI, Model_file);
 saveas(gcf, DESTINATION_FOLDER + 'output.png')
 saveas(gcf, DESTINATION_FOLDER + 'output.svg')
 
@@ -105,9 +107,9 @@ save(DESTINATION_FOLDER + 'quality_indicator.mat', 'quality_indicator');
 
 %% 
 
-function quality_indicator = Plot_PID(PID_kr, PID_Ti, PID_Td, filter_coeficient, w_target, u_limit, QI)
+function quality_indicator = Plot_PID(PID_kr, PID_Ti, PID_Td, filter_coeficient, w_target, u_limit, PID_h, QI, Model_file)
     w=warning('off','all');
-    sim_out = sim("object_with_PID.slx", "SrcWorkspace", "current", 'FastRestart', 'on');
+    sim_out = sim(Model_file, "SrcWorkspace", "current", 'FastRestart', 'on');
     warning(w);
     
     figure
@@ -125,14 +127,14 @@ end
 
 %% funkcja uruchamiająca symulacje i zwracająca wskażnik jakości
 
-function quality_indicator = PID_to_QI(PID_kr, PID_Ti, PID_Td, filter_coeficient, w_target, u_limit, QI)
+function quality_indicator = PID_to_QI(PID_kr, PID_Ti, PID_Td, filter_coeficient, w_target, u_limit, PID_h, QI, Model_file)
 
     filter_coeficient = 100;
     w_target = 0.5;
     u_limit = [0 1];
     
     w=warning('off','all');
-    sim_out = sim("object_with_PID.slx", "SrcWorkspace", "current", 'FastRestart', 'on');
+    sim_out = sim(Model_file, "SrcWorkspace", "current", 'FastRestart', 'on');
     warning(w);
 
     sim_out.SimulationMetadata.TimingInfo
