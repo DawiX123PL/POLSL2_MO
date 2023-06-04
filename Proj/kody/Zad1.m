@@ -1,12 +1,12 @@
 clear all; close all; clc;
 %%
 
-Alpha = [0.05]
+Alpha = [1];
 Delta = [0.001];
 
 QI = @(e) ISE_100(e);
 
-WYNIKI_FOLDER = "../wyniki/Zad1NoDelay";
+WYNIKI_FOLDER = "../wyniki/Zad1";
 model_file = "object_with_PID";
 
 

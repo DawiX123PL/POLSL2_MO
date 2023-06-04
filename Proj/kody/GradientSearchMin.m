@@ -13,8 +13,8 @@ function [x_min, trajectory, iter, Q_trajectory] =  GradientSearchMin(f, x0, eps
 
         %[grad, f_value] = Gradient(f,x_current, delta);
         [f_value, grad] = f(x_current);
-        %dir = -grad;
-        dir = -grad/norm(grad);
+        dir = -grad;
+        %dir = -grad/norm(grad);
 
         F = @(alfaf) f_wrap(f, x_current, dir, alfaf, delta);
         %[alfa, f_value] = fminsearch(F, 0);
@@ -33,11 +33,11 @@ function [x_min, trajectory, iter, Q_trajectory] =  GradientSearchMin(f, x0, eps
         fprintf("i = %10d \t QI = %10f \t |grad| = %10f \t alfa = %10f \t delta = %10f \n", ...
             iter, f_value, norm(grad), alfa, delta)
 
-        if iter > 1
-            if( Q_trajectory(iter) > Q_trajectory(iter-1) )
-                alfa = alfa / 2;
-            end
-        end
+        % if iter > 1
+        %     if( Q_trajectory(iter) > Q_trajectory(iter-1) )
+        %         alfa = alfa / 2;
+        %     end
+        % end
 
         % kryterium stopu 1 
         if norm(grad) < epsilon{1}

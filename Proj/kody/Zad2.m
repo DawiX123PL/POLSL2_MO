@@ -1,13 +1,13 @@
 clear all; close all; clc;
 %%
 
-Alpha = [0.001, 0.01, 0.1, 1];
-Delta = [0.05, 1];
+Alpha = [1];
+Delta = [0.001];
 
 QI = @(e) MeanError(e);
 
 WYNIKI_FOLDER = "../wyniki/Zad2";
-model_file = "object_with_PID.slx";
+model_file = "object_with_PID";
 
 
 %%
