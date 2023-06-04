@@ -3,45 +3,41 @@ function [x_min, trajectory, iter, Q_trajectory] =  GradientSearchMin(f, x0, eps
    
     trajectory = {};
     Q_trajectory = [];
-
     x_current = x0;
-
-    waitbar_h = waitbar(0, 'Obliczenia metodą najszybszego spadku', ...
-        'Name', 'Obliczenia metodą najszybszego spadku', ...
-        'CreateCancelBtn','setappdata(gcbf,''canceling'',1)');
-
-    setappdata(waitbar_h,'canceling',0);
-
     f_value = inf;
 
+    fprintf("i = %10d \t QI = %10f \t |grad| = %10f \t alfa = %10f \t delta = %10f \n", ...
+        0, nan, nan, alfa, delta)
+    
     for iter = 1:n
 
-        if getappdata(waitbar_h,'canceling')
-            break;
-        end
+        %[grad, f_value] = Gradient(f,x_current, delta);
+        [f_value, grad] = f(x_current);
+        %dir = -grad;
+        dir = -grad/norm(grad);
 
-        waitbar(iter/n, waitbar_h, sprintf( ...
-            "iteracja: %d/%d wartość funkcji: %f alfa: %f ", ...
-            iter, n, f_value, alfa))
+        F = @(alfaf) f_wrap(f, x_current, dir, alfaf, delta);
+        %[alfa, f_value] = fminsearch(F, 0);
+        %[alfa, f_value] = fminbnd(F, 0, 10);
 
-        [grad, f_value] = Gradient(f,x_current, delta);
-        dir = grad/norm(grad);
-
-
-        %F = @(alfaf) f(x_current - grad * alfaf);
-        %[alfa_min, f_value] = fminsearch(F, 0, optimset("TolFun", 1e-8));
+        %options = optimoptions('fminunc','Algorithm','trust-region','SpecifyObjectiveGradient',true, 'TolX',epsilon{3}, 'TolFun', epsilon{3});
+        %[alfa, f_value] = fminunc(F, 0, options);
+        
 
         trajectory{end+1} = x_current;
         Q_trajectory(end+1) = f_value;
 
         x_old = x_current;
-        x_current =  x_current - dir * alfa;
+        x_current =  x_current + dir * alfa;
         
-%         if iter > 1
-%             if( Q_trajectory(iter) > Q_trajectory(iter-1) )
-%                 alfa = alfa / 2;
-%             end
-%         end
+        fprintf("i = %10d \t QI = %10f \t |grad| = %10f \t alfa = %10f \t delta = %10f \n", ...
+            iter, f_value, norm(grad), alfa, delta)
+
+        if iter > 1
+            if( Q_trajectory(iter) > Q_trajectory(iter-1) )
+                alfa = alfa / 2;
+            end
+        end
 
         % kryterium stopu 1 
         if norm(grad) < epsilon{1}
@@ -52,14 +48,22 @@ function [x_min, trajectory, iter, Q_trajectory] =  GradientSearchMin(f, x0, eps
         if norm(x_current - x_old) < epsilon{2}
             break
         end
-
     end
 
     trajectory{end+1} = x_current;
     Q_trajectory(end+1) = f_value;
-
-    delete(waitbar_h);
     x_min = x_current;
+
+end
+
+
+function [val, grad] = f_wrap(f, x_current, dir, alfa, delta)
+
+    y = f(x_current + dir * alfa);
+    y_delta = f(x_current + dir * (alfa + delta));
+
+    val = y;
+    grad = (y_delta - y) / delta;
 
 end
 

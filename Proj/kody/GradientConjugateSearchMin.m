@@ -4,22 +4,17 @@ function [x_min, trajectory, iter] =  GradientConjugateSearchMin(f, x0, epsilon,
 
    
     trajectory = {};
-
     x_current = x0;
-
-    waitbar_h = waitbar(0, 'Obliczenia metodą najszybszego spadku', 'Name', 'Obliczenia metodą najszybszego spadku');
- 
     f_value = inf;
 
 
     [grad, f_value] = Gradient(f,x_current, delta);
     dir = -grad;
 
-    for iter = 1:n
+    fprintf("i = %10d \t QI = %10f \t |grad| = %10f \t alfa = %10f \t delta = %10f \n", ...
+        0, nan, nan, alfa, delta)
 
-        waitbar(iter/n, waitbar_h, sprintf( ...
-            "iteracja: %d/%d wartość funkcji: %f alfa: %f ", ...
-            iter, n, f_value, alfa))
+    for iter = 1:n
 
         F = @(alfaf) f(x_current + dir * alfaf);
         [alfa, f_value] = fminsearch(F, 0, optimset("TolFun", 1e-8));
@@ -27,6 +22,9 @@ function [x_min, trajectory, iter] =  GradientConjugateSearchMin(f, x0, epsilon,
         trajectory{iter} = x_current;
 
         x_current =  x_current + dir * alfa;
+
+        fprintf("i = %10d \t QI = %10f \t |grad| = %10f \t alfa = %10f \t delta = %10f \n", ...
+            iter, f_value, norm(grad), alfa, delta)
 
         % kryterium stopu 1 
         if norm(grad) < epsilon
@@ -41,10 +39,7 @@ function [x_min, trajectory, iter] =  GradientConjugateSearchMin(f, x0, epsilon,
 
     end
 
-
-    close(waitbar_h);
-
-
+    
     x_min = x_current;
 
 end
