@@ -1,4 +1,4 @@
-function TunePID(alfa, delta, QI, model_file, destination_folder)
+function TunePID(alfa, delta, QI, model_file, destination_folder, min_method)
         
     % parametry optymalizacji
     
@@ -19,8 +19,8 @@ function TunePID(alfa, delta, QI, model_file, destination_folder)
     
     x0 = [PID_kr, PID_Ti, PID_Td] % punkt poczatkowy optymalizacji
     
-    n = 200;
-    epsilon = {0.0000001, 0.0000001, 0.0000001};
+    n = 1000;
+    epsilon = {0.00001, 0.00001, 0.00001};
     %delta = 0.001; % delta = {0.001, 0.01, 0.1, 1}
     %alfa = 1; % alfa = {0.05, 1}
     
@@ -40,8 +40,15 @@ function TunePID(alfa, delta, QI, model_file, destination_folder)
     
     % minimalizacja
     tic
-    [x_min, trajectory, iter, Q_trajectory] = GradientSearchMin(F, x0, epsilon, n, delta, alfa);
-    % [x_min, trajectory, iter] = GradientConjugateSearchMin(F, x0, epsilon, n, delta, alfa);
+    if min_method == "GradProsty"
+        [x_min, trajectory, iter, Q_trajectory] = GradientSearchMin(F, x0, epsilon, n, delta, alfa);
+    elseif min_method == "GradProstyMOD"
+        [x_min, trajectory, iter, Q_trajectory] = GradientSearchMinMOD(F, x0, epsilon, n, delta, alfa);
+    elseif min_method == "GradSprzezony"
+        [x_min, trajectory, iter] = GradientConjugateSearchMin(F, x0, epsilon, n, delta, alfa);
+    else
+        error("Nie wybrano metody minimalizacji")
+    end
     toc
     
     PID_kr_opt = x_min(1)

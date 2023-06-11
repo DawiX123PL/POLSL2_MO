@@ -22,7 +22,7 @@ Model_file = "object_with_PID.slx"
 
 x0 = [PID_kr, PID_Ti, PID_Td] % punkt poczatkowy optymalizacji
 
-n = 200;
+n = 1000;
 epsilon = {0.00001, 0.00001};
 delta = 0.001; % delta = {0.001, 0.01, 0.1, 1}
 alfa = 1; % alfa = {0.05, 1}
