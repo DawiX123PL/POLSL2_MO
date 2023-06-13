@@ -1,21 +1,17 @@
 clear all; close all; clc;
 %%
 
-Alpha = [1];
+Alpha = [0.1];
 Delta = [0.001];
+epsilon = {0.0001, 0.0001}
 
-QI = @(e) MeanError(e);
+QI = @(e, u) MeanError(e);
 
 WYNIKI_FOLDER = "../wyniki/Zad4/GPM";
 model_file = "object_with_Discrete";
 
 
-%%
+metoda_optymalizacji = "GradProstyMOD";
 
-for alpha = Alpha
-    for delta = Delta
-        DESTINATION_FOLDER = WYNIKI_FOLDER + "\a_" + string(alpha) + "_d_" + string(delta) + "\";
-        mkdir(DESTINATION_FOLDER)
-        TunePID(alpha, delta, QI, model_file, DESTINATION_FOLDER, "GradProstyMOD")
-    end
-end
+%%
+Zad1234_Com
