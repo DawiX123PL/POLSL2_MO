@@ -7,6 +7,6 @@ for alpha = Alpha
             "_e1-" + string(epsilon{1}) + ...
             "_e2-" + string(epsilon{2}) + "\";
         mkdir(DESTINATION_FOLDER)
-        TunePID(alpha, delta, epsilon, QI, model_file, DESTINATION_FOLDER, "GradProstyMOD")
+        TunePID(alpha, delta, epsilon, QI, model_file, DESTINATION_FOLDER, metoda_optymalizacji)
     end
 end
