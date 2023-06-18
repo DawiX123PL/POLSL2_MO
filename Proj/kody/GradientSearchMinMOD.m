@@ -10,11 +10,14 @@ function [x_min, trajectory, iter, Q_trajectory] =  GradientSearchMinMOD(f, x0, 
         0, nan, nan, alfa, delta)
     
     for iter = 1:n
-
         %[grad, f_value] = Gradient(f,x_current, delta);
         [f_value, grad] = f(x_current);
         %dir = -grad;
-        dir = -grad/norm(grad);
+        if norm(grad) > 0
+            dir = -grad/norm(grad);
+        else
+            dir = -grad;
+        end
 
         F = @(alfaf) f_wrap(f, x_current, dir, alfaf, delta);
         %[alfa, f_value] = fminsearch(F, 0);

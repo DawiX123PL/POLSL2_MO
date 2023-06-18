@@ -199,7 +199,7 @@ function [qi, grad] = PID_to_QI(PID_kr1, PID_Ti1, PID_Td1, filter_coeficient, w_
     qi_ti = QI(sim_out_TI.E);
     qi_td = QI(sim_out_TD.E);
 
-    grad = [qi_kr - qi, qi_ti - qi, qi_td - qi];
+    grad = [qi_kr - qi, qi_ti - qi, qi_td - qi] / delta;
 
 end
 
@@ -220,7 +220,6 @@ function [qi, grad] = PID_to_QI1(PID_kr1, PID_Ti1, PID_Td1, filter_coeficient, w
         Simulink.SimulationInput(model_file);
     ];
 
-    delta = 1;
     sim_in(1) = sim_in(1).setVariable('PID_kr', PID_kr1);
     sim_in(1) = sim_in(1).setVariable('PID_Ti', PID_Ti1);
     sim_in(1) = sim_in(1).setVariable('PID_Td', PID_Td1);
@@ -265,7 +264,7 @@ function [qi, grad] = PID_to_QI1(PID_kr1, PID_Ti1, PID_Td1, filter_coeficient, w
     qi_ti = QI(sim_out(3).E, sim_out(3).U);
     qi_td = QI(sim_out(4).E, sim_out(4).U);
 
-    grad = [qi_kr - qi, qi_ti - qi, qi_td - qi];
+    grad = [qi_kr - qi, qi_ti - qi, qi_td - qi] / delta;
 
 end
 
